@@ -8,7 +8,7 @@ This script takes a folder containing at least one transcription from the GLOBAL
 At least one transcription from the [GLOBALISE dataverse](https://hdl.handle.net/10622/LVXSBW). The most recent version is available at Dataverse. Download either the .txt files or the .xml files. .txt files are a lot faster and take a lot less space on your harddrive. For the purposes of this script, they are identical.
 
 #### Python
-Required packages: Pandas, OS, TQDM
+Required packages: Pandas, OS, TQDM, SYS
 
 ### How to use it
 
