@@ -82,7 +82,7 @@ def analyze_dictionary(tokenized_dict, gloss_indicators, gloss_length):
     for key in tokenized_dict.keys():
         output = output + glosses_on_page(tokenized_dict[key], gloss_indicators, gloss_length, key)
     
-    return pd.DataFrame(output, columns=['Term', 'Indicator', 'Glossed As', 'Page'])
+    return pd.DataFrame(output, columns=['Term', 'Indicator', 'Glossed As', 'Page', 'Extended Context Pre', 'Extended Context Post'])
 
 def glosses_on_page(tokenized_text, gloss_indicators, gloss_length, page):
     
@@ -104,7 +104,25 @@ def glosses_on_page(tokenized_text, gloss_indicators, gloss_length, page):
                         gloss += ' ' + tokenized_text[next_index]
                         next_index += 1
                 
-                output.append([tokenized_text[index-1].strip(','), token, gloss.strip(), page])
+                # Extract extended context: 5 words before indicator and 10 words after
+                context_before = []
+                context_after = []
+                
+                # Get 5 words before the indicator
+                start_before = max(0, index - 5)
+                for i in range(start_before, index):
+                    if i < len(tokenized_text):
+                        context_before.append(tokenized_text[i])
+                
+                # Get 10 words after the indicator
+                for i in range(index + 1, min(len(tokenized_text), index + 11)):
+                    context_after.append(tokenized_text[i])
+                
+                # Combine context
+                context_before  = ' '.join(context_before[:-1]) 
+                context_after = ' '.join(context_after)
+                
+                output.append([tokenized_text[index-1].strip(','), token, gloss.strip(), page, context_before, context_after])
                 
     return output
 
