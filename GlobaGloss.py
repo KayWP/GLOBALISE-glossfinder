@@ -24,9 +24,9 @@ def main():
     #list all files in the folder with the necessary expansion
     files_to_analyze = [f for f in os.listdir(folder_path) if f.endswith(file_extension)]
 
-    #initialize an empty list to store dataframes in
-    dataframes = []
-    dicts = []
+    # Initialize CSV file with headers to output to
+    output_file_path = output_file_name + '.csv'
+    first_file = True
 
     # Use tqdm to create a progress bar
     with tqdm(total=len(files_to_analyze), desc="Processing files") as pbar:
@@ -34,15 +34,20 @@ def main():
         for file_name in files_to_analyze:
             file_path = os.path.join(folder_path, file_name)
             token_dict = parse_pages(file_path)
-            dicts.append(token_dict)
             df = analyze_dictionary(token_dict, of_dict, 5)
-            dataframes.append(df)
-            pbar.update(1)  # Increment progress bar
+            # Write to CSV after processing each file
+            if first_file:
+                # Write with header for the first file
+                df.to_csv(output_file_path, index=False)
+                first_file = False
+            else:
+                # Append without header for subsequent files
+                df.to_csv(output_file_path, mode='a', header=False, index=False)
 
-# Concatenate all dataframes into one merged dataframe
-    merged_df = pd.concat(dataframes, ignore_index=True)
-   
-    merged_df.to_csv(output_file_name + '.csv')
+            # Clear variables to free memory
+            del token_dict
+            del df
+            pbar.update(1)  # Increment progress bar
 
 def parse_pages(file_path, encoding='utf-8'):
     #looks through a GLOBALISE text file and splits the information into scan-level text chunks
